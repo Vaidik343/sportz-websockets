@@ -22,9 +22,20 @@ export function attachWebSocketServer(server) {
   });
 
   wss.on('connection', (socket) => {
+    socket.isAlive = true;
+    socket.on('pong', () => {socket.isAlive = true;});
     console.log('🔌 WS connected');
-
     sendJson(socket, { type: 'welcome' });
+
+    socket.on('error', console.error);
+
+    const interval = setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if(ws.isAlive === false) return ws.terminate();
+            ws.isAlive = false;
+            ws.ping();
+        });
+    }, 30000);
 
     socket.on('message', (data) => {
       console.log('📨 WS message:', data.toString());
@@ -45,3 +56,4 @@ export function attachWebSocketServer(server) {
 
   return { broadcastMatchCreated };
 }
+
