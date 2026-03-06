@@ -12,9 +12,9 @@ arcjet({
         shield({
             mode: arcjetMode
         }),
-        detectBot({
-            mode: arcjetMode, allow: ['CATEGORY:SEARCH_ENGINE', "CATEGORY:PREVIEW"]
-        }),
+        // detectBot({
+        //     mode: arcjetMode, allow: ['CATEGORY:SEARCH_ENGINE', "CATEGORY:PREVIEW"]
+        // }),
         slidingWindow({mode: arcjetMode, interval: '10s', max:50})
     ]
 
@@ -45,19 +45,28 @@ export function securityMiddleware() {
 
         try {
             const decision = await httpArcjet.protect(req);
+            
+            console.log("[Arcjet] Decision:", {
+                isDenied: decision.isDenied(),
+                conclusion: decision.conclusion,
+                reason: decision.reason?.constructor?.name,
+                reasonType: decision.reason
+            });
 
             if(decision.isDenied())
             {
+                // Check rate limit first
                 if(decision.reason.isRateLimit())
                 {
                     return res.status(429).json({error: 'Too many requests.'});
-
                 }
 
+                // Shield or bot detection blocked the request
+                console.log("[Arcjet] Blocked by:", decision.reason);
                 return res.status(403).json({
-                    error:'Forbidden'
+                    error:'Forbidden',
+                    reason: decision.reason?.constructor?.name || 'Unknown'
                 })
-
             }
         } catch (error) {
             console.error("Arcjet middleware error", error);

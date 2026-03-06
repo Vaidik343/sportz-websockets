@@ -39,7 +39,7 @@ matchRouter.get('/', async (req, res) => {
 matchRouter.post('/',async (req, res) => {
     const parsed = createMatchSchema.safeParse(req.body);
     console.log("🚀 ~ parsed:", parsed)
-    const {data: {sport,startTime, endTime, homeScore, awayScore}} = parsed
+    const {data: {startTime, endTime, homeScore, awayScore}} = parsed
     
 
     if(!parsed.success)
