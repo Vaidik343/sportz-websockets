@@ -116,6 +116,7 @@ export function attachWebSocketServer(server) {
 
        if(decision.isDenied())
        {
+         console.log(`[WS Arcjet] Connection denied. Reason: ${decision.reason.constructor.name}`);
          if(decision.reason.isRateLimit()) {
           socket.write('HTTP/1.1 429 Too Many Requests\r\n\r\n');
         } else {

@@ -7,6 +7,7 @@ import { matchRouter } from './routes/matches.js';
 import {commentaryRouter} from "./routes/commentary.js";
 import { attachWebSocketServer } from './ws/server.js';
 import { securityMiddleware } from './arcjet.js';
+import cors from 'cors';
 
 
 const app = express();
@@ -14,10 +15,11 @@ const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 app.use(express.json());
+app.use(cors());
 const server = http.createServer(app);
 
 // Apply Arcjet security middleware to protect all routes
-app.use(securityMiddleware());
+// app.use(securityMiddleware());
 
 app.get('/', (req, res) => {
     res.send('Hello from Express server!');
